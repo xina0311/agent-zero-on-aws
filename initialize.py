@@ -3,6 +3,31 @@ from agent import AgentConfig, ModelConfig
 from python.helpers import runtime, settings, defer
 from python.helpers.print_style import PrintStyle
 
+def initialize():
+    """
+    Example function showing different model initialization options.
+    This can be used as a reference for initializing different model types.
+    """
+    # main chat model used by agents (smarter, more accurate)
+    # chat_llm = models.get_openai_chat(model_name="gpt-4o-mini", temperature=0)
+    # chat_llm = models.get_ollama_chat(model_name="llama3.2:3b-instruct-fp16", temperature=0)
+    # chat_llm = models.get_lmstudio_chat(model_name="lmstudio-community/Meta-Llama-3.1-8B-Instruct-GGUF", temperature=0)
+    # chat_llm = models.get_openrouter_chat(model_name="openai/o1-mini-2024-09-12")
+    # chat_llm = models.get_azure_openai_chat(deployment_name="gpt-4o-mini", temperature=0)
+    # chat_llm = models.get_anthropic_chat(model_name="claude-3-5-sonnet-20240620", temperature=0)
+    # chat_llm = models.get_google_chat(model_name="gemini-1.5-flash", temperature=0)
+    # chat_llm = models.get_mistral_chat(model_name="mistral-small-latest", temperature=0)
+    # chat_llm = models.get_groq_chat(model_name="llama-3.2-90b-text-preview", temperature=0)
+    # chat_llm = models.get_sambanova_chat(model_name="Meta-Llama-3.1-70B-Instruct-8k", temperature=0)
+    chat_llm = models.get_bedrock_chat(model_id="anthropic.claude-3-sonnet-20240229-v1:0")
+    
+    # embedding model used for memory
+    # embedding_llm = models.get_openai_embedding(model_name="text-embedding-3-small")
+    embedding_llm = models.get_ollama_embedding(model_name="nomic-embed-text")
+    # embedding_llm = models.get_huggingface_embedding(model_name="sentence-transformers/all-MiniLM-L6-v2")
+    # embedding_llm = models.get_lmstudio_embedding(model_name="nomic-ai/nomic-embed-text-v1.5-GGUF")
+    
+    return chat_llm, embedding_llm
 
 def initialize_agent():
     current_settings = settings.get_settings()

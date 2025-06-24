@@ -26,13 +26,17 @@ from langchain_google_genai import (
     embeddings as google_embeddings,
 )
 from langchain_mistralai import ChatMistralAI
-
-# from pydantic.v1.types import SecretStr
+import boto3
+from langchain_aws import ChatBedrock
+from pydantic.v1.types import SecretStr
 from python.helpers import dotenv, runtime
 from python.helpers.dotenv import load_dotenv
 from python.helpers.rate_limiter import RateLimiter
 
-# environment variables
+# environment variables, clean out old AWS creds and use ones in .env
+for key in ["AWS_ACCESS_KEY_ID", "AWS_SECRET_ACCESS_KEY", "AWS_SESSION_TOKEN"]:
+    if key in os.environ:
+        del os.environ[key]
 load_dotenv()
 
 
@@ -55,6 +59,7 @@ class ModelProvider(Enum):
     OPENAI_AZURE = "OpenAI Azure"
     OPENROUTER = "OpenRouter"
     SAMBANOVA = "Sambanova"
+    BEDROCK = "Bedrock"
     OTHER = "Other"
 
 
@@ -401,6 +406,19 @@ def get_sambanova_embedding(
             or "https://fast-api.snova.ai/v1"
         )
     return OpenAIEmbeddings(model=model_name, api_key=api_key, base_url=base_url, **kwargs)  # type: ignore
+
+
+# Bedrock models
+def get_bedrock_chat(model_id: str, **kwargs):
+    session = boto3.Session(
+        region_name=os.getenv("REGION_NAME"),
+        aws_access_key_id=os.getenv("AWS_ACCESS_KEY_ID"), 
+        aws_secret_access_key=os.getenv("AWS_SECRET_ACCESS_KEY"),
+        aws_session_token=os.getenv("AWS_SESSION_TOKEN")
+    )
+    bedrock_client = session.client(service_name="bedrock-runtime")
+
+    return ChatBedrock(client=bedrock_client, model_id=model_id, **kwargs)
 
 
 # Other OpenAI compatible models
